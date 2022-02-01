@@ -40,9 +40,9 @@ const mostCommon = async (args: string[]) => {
     const sorted = countDescending(importCountMap.list());
 
     if (args[1] === "--json") {
-      json(sorted);
+      console.log(json(sorted));
     } else {
-      text(sorted);
+      text(sorted).forEach((line) => console.log(line));
     }
   });
 };

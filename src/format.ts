@@ -1,21 +1,15 @@
 import type { ImportCount } from "./map";
 
 export const text = (importCounts: ImportCount[]) => {
-  for (const importCount of importCounts) {
+  return importCounts.map((importCount) => {
     if (importCount.kind === "default") {
-      console.log(
-        `import ${importCount.ident} from "${importCount.mod}": ${importCount.count}`
-      );
+      return `import ${importCount.ident} from "${importCount.mod}": ${importCount.count}`;
     } else if (importCount.kind === "namespace") {
-      console.log(
-        `import * as ${importCount.ident} from "${importCount.mod}": ${importCount.count}`
-      );
+      return `import * as ${importCount.ident} from "${importCount.mod}": ${importCount.count}`;
     } else {
-      console.log(
-        `import { ${importCount.ident} } from "${importCount.mod}": ${importCount.count}`
-      );
+      return `import { ${importCount.ident} } from "${importCount.mod}": ${importCount.count}`;
     }
-  }
+  });
 };
 
 export const json = (importCounts: ImportCount[]) => {
@@ -37,5 +31,5 @@ export const json = (importCounts: ImportCount[]) => {
     return acc;
   }, {} as { [mod: string]: Omit<ImportCount, "mod">[] });
 
-  console.log(JSON.stringify(json));
+  return JSON.stringify(json);
 };
