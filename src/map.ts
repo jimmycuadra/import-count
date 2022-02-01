@@ -8,7 +8,7 @@ type IdentCount = Ident & Count;
 
 export type ImportCount = Import & Count;
 
-export class ImportCountMap {
+export class ImportMap {
   #map: Record<string, Record<string, IdentCount>>;
 
   constructor() {
@@ -55,4 +55,4 @@ export class ImportCountMap {
   }
 }
 
-export default ImportCountMap;
+export default ImportMap;

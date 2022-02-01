@@ -1,4 +1,4 @@
-import type { ImportCount } from "./importCountMap";
+import type { ImportCount } from "./map";
 
 export const text = (importCounts: ImportCount[]) => {
   for (const importCount of importCounts) {

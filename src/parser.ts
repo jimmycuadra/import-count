@@ -5,7 +5,7 @@ import { Parser as BaseParser } from "acorn";
 import acornJsx from "acorn-jsx";
 import type { Program } from "estree";
 
-import ImportCountMap from "./importCountMap";
+import ImportMap from "./map";
 
 export interface Ident {
   ident: string;
@@ -69,22 +69,19 @@ const trackImports = (
 };
 
 export const parsePaths = async (rootPath: string, paths: string[]) => {
-  const importCountMap = new ImportCountMap();
+  const importMap = new ImportMap();
 
   for (const path of paths) {
-    Object.assign(
-      importCountMap,
-      await parsePath(rootPath, path, importCountMap)
-    );
+    Object.assign(importMap, await parsePath(rootPath, path, importMap));
   }
 
-  return importCountMap;
+  return importMap;
 };
 
 export const parsePath = async (
   rootPath: string,
   path: string,
-  importCountMap = new ImportCountMap()
+  importCountMap = new ImportMap()
 ) => {
   const sourceCode = await readFile(path, "utf8");
 
