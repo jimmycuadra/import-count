@@ -1,20 +1,29 @@
 {
   "name": "import-count",
   "version": "0.1.0",
-  "description": "A tool for finding the most common imports in your code.",
+  "description": "A command line interface for analyzing import statements in JavaScript code.",
   "bin": "bin/import-count",
   "main": "dist/index.js",
   "repository": "https://github.com/jimmycuadra/import-count",
   "author": "Jimmy Cuadra",
   "license": "MIT",
+  "keywords": [
+    "cli",
+    "esm",
+    "esmodules",
+    "import",
+    "javascript",
+    "jsx"
+  ],
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "yarn run tsc",
+    "build": "rm -rf dist && yarn run tsc",
     "format": "yarn run prettier --write --ignore-unknown .",
     "lint": "yarn run eslint . --ext .ts,.tsx",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "prepublish": "yarn run build"
   },
   "dependencies": {
     "acorn": "^8.7.0",

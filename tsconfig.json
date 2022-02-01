@@ -8,6 +8,8 @@
     "resolveJsonModule": true,
     "sourceMap": true,
     "outDir": "dist",
+    "declaration": true,
+    "declarationMap": true,
     "isolatedModules": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,

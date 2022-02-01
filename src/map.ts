@@ -1,4 +1,4 @@
-import type { Ident, Import } from "./parser";
+import type { Ident, Import } from "./parse";
 
 interface Count {
   count: number;
