@@ -7,7 +7,9 @@
   "repository": "https://github.com/jimmycuadra/import-count",
   "author": "Jimmy Cuadra",
   "license": "MIT",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "yarn run tsc"
   },

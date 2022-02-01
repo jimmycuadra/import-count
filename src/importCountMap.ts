@@ -18,7 +18,7 @@ export class ImportCountMap {
   increment({ ident, kind, mod }: Import): void {
     const sourceCountMap = this.#map[mod] ?? (this.#map[mod] = {});
 
-    const key = ident + '.' + kind;
+    const key = ident + "." + kind;
 
     const identOccurrence = sourceCountMap[key];
 
