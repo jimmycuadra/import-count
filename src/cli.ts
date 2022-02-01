@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 import { normalize, resolve, sep } from "path";
 
 import glob from "glob";
