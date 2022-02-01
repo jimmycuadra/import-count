@@ -4,7 +4,7 @@ import { normalize, resolve, sep } from "path";
 
 import glob from "glob";
 
-import { countDescending, parsePaths, text } from "./";
+import { countDescending, json, parsePaths, text } from "./";
 
 const mostCommon = async (args: string[]) => {
   const rawRootPath = args[0];
@@ -28,7 +28,9 @@ const mostCommon = async (args: string[]) => {
     }
 
     if (paths.length === 0) {
-      console.error(`Error: No JS or JSX source files found under path "${rootPath}".`);
+      console.error(
+        `Error: No JS or JSX source files found under path "${rootPath}".`
+      );
       process.exit(1);
     }
 
@@ -37,7 +39,13 @@ const mostCommon = async (args: string[]) => {
       paths.map((path) => resolve(path))
     );
 
-    text(countDescending(importCountMap.list()));
+    const sorted = countDescending(importCountMap.list());
+
+    if (args[1] === "--json") {
+      json(sorted);
+    } else {
+      text(sorted);
+    }
   });
 };
 
@@ -48,8 +56,18 @@ import-count
 Usage: import-count COMMAND [...OPTIONS]
 
 Commands:
-  most-common DIR - Print every import found in the JS and JSX files in DIR,
-                    sorted with the most frequently occurring first.
+
+  most-common DIR [--json]
+
+    Print every import found in the JS and JSX files in DIR, sorted with the
+    most frequently occurring first. By default, the output is human-readable,
+    with each line showing the import as it would appear in JavaScript code,
+    followed by the number of times that identifier was imported from that
+    module. If the --json flag is given, the output will be JSON, where the keys
+    are module names and the values are an array of objects representing each
+    identifier imported from that module, including the kind of import (named,
+    default, or namespace), and the number of times that identifier was imported
+    from that module.
 `);
 };
 
@@ -61,7 +79,9 @@ export const run = async () => {
   } else if (args[0] === "help" || args[0] === "--help") {
     help();
   } else {
-    console.log("Error: A command is required! Run `import-count help` to list commands.");
+    console.log(
+      "Error: A command is required! Run `import-count help` to list commands."
+    );
     process.exit(1);
   }
 };
