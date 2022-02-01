@@ -2,14 +2,14 @@
   "name": "import-count",
   "version": "0.1.0",
   "description": "A tool for finding the most common imports in your code.",
-  "bin": "dist/cli.js",
+  "bin": "bin/import-count",
   "main": "dist/index.js",
   "repository": "https://github.com/jimmycuadra/import-count",
   "author": "Jimmy Cuadra",
   "license": "MIT",
+  "files": ["dist"],
   "scripts": {
-    "build": "yarn run tsc && chmod 755 dist/cli.js",
-    "import-count": "yarn run ts-node src/cli.ts"
+    "build": "yarn run tsc"
   },
   "dependencies": {
     "acorn": "^8.7.0",
