@@ -4,7 +4,7 @@ import { normalize, resolve, sep } from "path";
 
 import glob from "glob";
 
-import { parsePaths } from "./";
+import { countDescending, parsePaths, text } from "./";
 
 const mostCommon = async (args: string[]) => {
   const rawRootPath = args[0];
@@ -37,7 +37,7 @@ const mostCommon = async (args: string[]) => {
       paths.map((path) => resolve(path))
     );
 
-    importCountMap.print();
+    text(countDescending(importCountMap.list()));
   });
 };
 
