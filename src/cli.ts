@@ -19,32 +19,41 @@ const mostCommon = async (args: string[]) => {
       ? normalizedRootPath.slice(0, -1)
       : normalizedRootPath;
 
-  glob(`${rootPath}/**/*.js{,x}`, async (err, paths) => {
-    if (err != null) {
-      console.error(err);
-      process.exit(1);
-    }
+  glob(
+    `${rootPath}/**/*.js{,x}`,
+    {
+      ignore: [`${rootPath}/**/node_modules/**/*`],
+    },
+    async (err, paths) => {
+      if (err != null) {
+        console.error(err);
+        process.exit(1);
+      }
 
-    if (paths.length === 0) {
-      console.error(
-        `Error: No JS or JSX source files found under path "${rootPath}".`
+      if (paths.length === 0) {
+        console.error(
+          `Error: No JS or JSX source files found under path "${rootPath}".`
+        );
+        process.exit(1);
+      }
+
+      const importCountMap = await parsePaths(
+        resolve(rootPath),
+        paths.map((path) => resolve(path))
       );
-      process.exit(1);
+
+      const sorted = countDescending(importCountMap.list());
+
+      if (sorted.length === 0) {
+        console.error("No import statements found.");
+        process.exit(1);
+      } else if (args[1] === "--json") {
+        console.log(json(sorted));
+      } else {
+        text(sorted).forEach((line) => console.log(line));
+      }
     }
-
-    const importCountMap = await parsePaths(
-      resolve(rootPath),
-      paths.map((path) => resolve(path))
-    );
-
-    const sorted = countDescending(importCountMap.list());
-
-    if (args[1] === "--json") {
-      console.log(json(sorted));
-    } else {
-      text(sorted).forEach((line) => console.log(line));
-    }
-  });
+  );
 };
 
 const help = () => {
@@ -73,7 +82,7 @@ export const run = async () => {
   const args = process.argv.slice(2);
 
   if (args[0] === "most-common") {
-    mostCommon(args.slice(1));
+    await mostCommon(args.slice(1));
   } else if (args[0] === "help" || args[0] === "--help") {
     help();
   } else {
