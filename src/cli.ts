@@ -1,17 +1,11 @@
 import { normalize, resolve, sep } from "path";
+import { Command } from "commander";
 
 import glob from "glob";
 
 import { countDescending, json, parsePaths, text } from "./";
 
-const mostCommon = async (args: string[]) => {
-  const rawRootPath = args[0];
-
-  if (rawRootPath == null) {
-    console.error("Error: Missing required argument: DIR");
-    process.exit(1);
-  }
-
+const mostCommon = async (rawRootPath: string, options: { json: boolean }) => {
   const normalizedRootPath = normalize(rawRootPath);
 
   const rootPath =
@@ -37,17 +31,17 @@ const mostCommon = async (args: string[]) => {
         process.exit(1);
       }
 
-      const importCountMap = await parsePaths(
+      const importMap = await parsePaths(
         resolve(rootPath),
         paths.map((path) => resolve(path))
       );
 
-      const sorted = countDescending(importCountMap.list());
+      const sorted = countDescending(importMap.list());
 
       if (sorted.length === 0) {
         console.error("No import statements found.");
         process.exit(1);
-      } else if (args[1] === "--json") {
+      } else if (options.json) {
         console.log(json(sorted));
       } else {
         text(sorted).forEach((line) => console.log(line));
@@ -56,39 +50,29 @@ const mostCommon = async (args: string[]) => {
   );
 };
 
-const help = () => {
-  console.log(`
-import-count
-
-Usage: import-count COMMAND [...OPTIONS]
-
-Commands:
-
-  most-common DIR [--json]
-
-    Print every import found in the JS and JSX files in DIR, sorted with the
-    most frequently occurring first. By default, the output is human-readable,
-    with each line showing the import as it would appear in JavaScript code,
-    followed by the number of times that identifier was imported from that
-    module. If the --json flag is given, the output will be JSON, where the keys
-    are module names and the values are an array of objects representing each
-    identifier imported from that module, including the kind of import (named,
-    default, or namespace), and the number of times that identifier was imported
-    from that module.
-`);
-};
-
 export const run = async () => {
-  const args = process.argv.slice(2);
+  const command = new Command("import-count").version("0.1.1");
 
-  if (args[0] === "most-common") {
-    await mostCommon(args.slice(1));
-  } else if (args[0] === "help" || args[0] === "--help") {
-    help();
-  } else {
-    console.log(
-      "Error: A command is required! Run `import-count help` to list commands."
-    );
-    process.exit(1);
-  }
+  command
+    .command("most-common")
+    .argument(
+      "<dir>",
+      `Absolute or relative path to a directory containing
+            JS and/or JSX source files.`
+    )
+    .option("--json", "Output JSON instead of human-readable text.")
+    .description(
+      `Print every import found in the JS and JSX files in <dir>, sorted with the
+most frequently occurring first. By default, the output is human-readable,
+with each line showing the import as it would appear in JavaScript code,
+followed by the number of times that identifier was imported from that
+module. If the --json flag is given, the output will be JSON, where the keys
+are module names and the values are an array of objects representing each
+identifier imported from that module, including the kind of import (named,
+default, or namespace), and the number of times that identifier was imported
+from that module.`
+    )
+    .action(mostCommon);
+
+  await command.parseAsync();
 };
