@@ -19,23 +19,19 @@ yarn global add import-count
 ## Synopsis
 
 ```
-import-count
+Usage: import-count [options] [command]
 
-Usage: import-count COMMAND [...OPTIONS]
+Options:
+  -V, --version                   output the version number
+  -h, --help                      display help for command
 
 Commands:
-
-  most-common DIR [--json]
-
-    Print every import found in the JS and JSX files in DIR, sorted with the
-    most frequently occurring first. By default, the output is human-readable,
-    with each line showing the import as it would appear in JavaScript code,
-    followed by the number of times that identifier was imported from that
-    module. If the --json flag is given, the output will be JSON, where the keys
-    are module names and the values are an array of objects representing each
-    identifier imported from that module, including the kind of import (named,
-    default, or namespace), and the number of times that identifier was imported
-    from that module.
+  most-common [options] <dir>     print each unique import found in <dir> along
+                                  with its number of occurrences, sorted by most
+                                  frequently occurring
+  fewest-imports [options] <dir>  print each file in <dir> with its number of
+                                  imports, sorted by fewest imports
+  help [command]                  display help for command
 ```
 
 ## Legal
