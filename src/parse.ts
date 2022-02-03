@@ -91,7 +91,7 @@ export const parsePath = async (
   }) as unknown as Program;
 
   trackImports(root.body, rootPath, path, (imp) =>
-    importCountMap.increment(imp)
+    importCountMap.increment(path, imp)
   );
 
   return importCountMap;

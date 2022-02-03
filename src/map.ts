@@ -4,18 +4,34 @@ interface Count {
   count: number;
 }
 
+interface File {
+  path: string;
+}
+
 type IdentCount = Ident & Count;
 
 export type ImportCount = Import & Count;
 
+export type FileCount = File & Count;
+
 export class ImportMap {
+  #files: Record<string, number>;
   #map: Record<string, Record<string, IdentCount>>;
 
   constructor() {
     this.#map = {};
+    this.#files = {};
   }
 
-  increment({ ident, kind, mod }: Import): void {
+  increment(path: string, { ident, kind, mod }: Import): void {
+    const fileCount = this.#files[path];
+
+    if (fileCount == null) {
+      this.#files[path] = 1;
+    } else {
+      this.#files[path] += 1;
+    }
+
     const sourceCountMap = this.#map[mod] ?? (this.#map[mod] = {});
 
     const key = ident + "." + kind;
@@ -33,7 +49,22 @@ export class ImportMap {
     }
   }
 
-  list() {
+  listFiles(rootPath: string) {
+    return Object.keys(this.#files).reduce((acc, path) => {
+      const count = this.#files[path];
+
+      if (count != null) {
+        acc.push({
+          path: path.replace(rootPath, "").slice(1),
+          count,
+        });
+      }
+
+      return acc;
+    }, [] as FileCount[]);
+  }
+
+  listImports() {
     return Object.keys(this.#map).reduce((acc, mod) => {
       const idents = this.#map[mod];
 

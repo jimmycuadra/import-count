@@ -1,4 +1,4 @@
-import type { ImportCount } from "./map";
+import type { FileCount, ImportCount } from "./map";
 
 export const text = (importCounts: ImportCount[]) => {
   return importCounts.map((importCount) => {
@@ -9,6 +9,12 @@ export const text = (importCounts: ImportCount[]) => {
     } else {
       return `import { ${importCount.ident} } from "${importCount.mod}": ${importCount.count}`;
     }
+  });
+};
+
+export const textFiles = (fileCounts: FileCount[]) => {
+  return fileCounts.map((fileCount) => {
+    return `${fileCount.path}: ${fileCount.count}`;
   });
 };
 
@@ -32,4 +38,8 @@ export const json = (importCounts: ImportCount[]) => {
   }, {} as { [mod: string]: Omit<ImportCount, "mod">[] });
 
   return JSON.stringify(json);
+};
+
+export const jsonFiles = (fileCounts: FileCount[]) => {
+  return JSON.stringify(fileCounts);
 };

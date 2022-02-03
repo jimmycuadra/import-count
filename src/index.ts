@@ -1,4 +1,4 @@
 export { ImportMap } from "./map";
-export { countDescending } from "./sort";
+export { countDescending, countFilesAscending } from "./sort";
 export { parsePath, parsePaths } from "./parse";
-export { json, text } from "./format";
+export { json, jsonFiles, text, textFiles } from "./format";

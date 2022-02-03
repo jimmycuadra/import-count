@@ -1,4 +1,4 @@
-import type { ImportCount } from "./map";
+import type { FileCount, ImportCount } from "./map";
 
 export const countDescending = (importCounts: ImportCount[]) => {
   return importCounts.sort((a, b) => {
@@ -9,5 +9,11 @@ export const countDescending = (importCounts: ImportCount[]) => {
     }
 
     return b.count - a.count;
+  });
+};
+
+export const countFilesAscending = (fileCounts: FileCount[]) => {
+  return fileCounts.sort((a, b) => {
+    return a.count - b.count;
   });
 };

@@ -3,9 +3,21 @@ import { Command } from "commander";
 
 import glob from "glob";
 
-import { countDescending, json, parsePaths, text } from "./";
+import {
+  ImportMap,
+  countDescending,
+  countFilesAscending,
+  json,
+  jsonFiles,
+  parsePaths,
+  text,
+  textFiles,
+} from "./";
 
-const mostCommon = async (rawRootPath: string, options: { json: boolean }) => {
+const createImportMap = async (
+  rawRootPath: string,
+  callback: (rootPath: string, importMap: ImportMap) => void
+) => {
   const normalizedRootPath = normalize(rawRootPath);
 
   const rootPath =
@@ -31,23 +43,46 @@ const mostCommon = async (rawRootPath: string, options: { json: boolean }) => {
         process.exit(1);
       }
 
+      const resolvedRootPath = resolve(rootPath);
+
       const importMap = await parsePaths(
-        resolve(rootPath),
+        resolvedRootPath,
         paths.map((path) => resolve(path))
       );
 
-      const sorted = countDescending(importMap.list());
-
-      if (sorted.length === 0) {
-        console.error("No import statements found.");
-        process.exit(1);
-      } else if (options.json) {
-        console.log(json(sorted));
-      } else {
-        text(sorted).forEach((line) => console.log(line));
-      }
+      callback(resolvedRootPath, importMap);
     }
   );
+};
+
+const mostCommon = (rawRootPath: string, options: { json: boolean }) => {
+  return createImportMap(rawRootPath, (_, importMap) => {
+    const sorted = countDescending(importMap.listImports());
+
+    if (sorted.length === 0) {
+      console.error("No import statements found.");
+      process.exit(1);
+    } else if (options.json) {
+      console.log(json(sorted));
+    } else {
+      text(sorted).forEach((line) => console.log(line));
+    }
+  });
+};
+
+const fewestImports = (rawRootPath: string, options: { json: boolean }) => {
+  return createImportMap(rawRootPath, (rootPath, importMap) => {
+    const sorted = countFilesAscending(importMap.listFiles(rootPath));
+
+    if (sorted.length === 0) {
+      console.error("No import statements found.");
+      process.exit(1);
+    } else if (options.json) {
+      console.log(jsonFiles(sorted));
+    } else {
+      textFiles(sorted).forEach((line) => console.log(line));
+    }
+  });
 };
 
 export const run = async (version: string) => {
@@ -64,9 +99,21 @@ export const run = async (version: string) => {
     )
     .option("--json", "output JSON instead of human-readable text")
     .description(
-      "print the number of occurrences of each unique import found in the files within <dir>"
+      "print each unique import found in <dir> along with its number of occurrences, sorted by most frequently occurring"
     )
     .action(mostCommon);
+
+  command
+    .command("fewest-imports")
+    .argument(
+      "<dir>",
+      "absolute or relative path to a directory containing JS and/or JSX source files"
+    )
+    .option("--json", "output JSON instead of human-readable text")
+    .description(
+      "print each file in <dir> with its number of imports, sorted by fewest imports"
+    )
+    .action(fewestImports);
 
   await command.parseAsync();
 };
