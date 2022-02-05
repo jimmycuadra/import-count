@@ -19,8 +19,8 @@ const config = {
       return `yarn run lint --fix --max-warnings=0 ${filesToLint}`;
     },
     "yarn run format",
-    () => "yarn run tsc",
   ],
+  "src/**/*": () => "yarn run tsc",
 };
 
 module.exports = config;
