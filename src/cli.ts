@@ -14,9 +14,10 @@ import {
   textFiles,
 } from "./";
 
-const withCounter = async (
+const withCounter = async <Item>(
   rawRootPath: string,
-  callback: (rootPath: string, counter: Counter) => void
+  getItems: (rootPath: string, counter: Counter) => Item[],
+  useItems: (items: Item[]) => void
 ) => {
   const normalizedRootPath = normalize(rawRootPath);
 
@@ -50,39 +51,48 @@ const withCounter = async (
         paths.map((path) => resolve(path))
       );
 
-      callback(resolvedRootPath, counter);
+      const items = getItems(resolvedRootPath, counter);
+
+      if (items.length === 0) {
+        console.error("No import statements found.");
+        process.exit(1);
+      } else {
+        useItems(items);
+      }
     }
   );
 };
 
 const mostCommon = (rawRootPath: string, options: { json: boolean }) => {
-  return withCounter(rawRootPath, (_, counter) => {
-    const sorted = countDescending(counter.listImports());
-
-    if (sorted.length === 0) {
-      console.error("No import statements found.");
-      process.exit(1);
-    } else if (options.json) {
-      console.log(json(sorted));
-    } else {
-      text(sorted).forEach((line) => console.log(line));
+  return withCounter(
+    rawRootPath,
+    (_, counter) => {
+      return countDescending(counter.listImports());
+    },
+    (items) => {
+      if (options.json) {
+        console.log(json(items));
+      } else {
+        text(items).forEach((line) => console.log(line));
+      }
     }
-  });
+  );
 };
 
 const fewestImports = (rawRootPath: string, options: { json: boolean }) => {
-  return withCounter(rawRootPath, (rootPath, counter) => {
-    const sorted = countFilesAscending(counter.listFiles(rootPath));
-
-    if (sorted.length === 0) {
-      console.error("No import statements found.");
-      process.exit(1);
-    } else if (options.json) {
-      console.log(jsonFiles(sorted));
-    } else {
-      textFiles(sorted).forEach((line) => console.log(line));
+  return withCounter(
+    rawRootPath,
+    (rootPath, counter) => {
+      return countFilesAscending(counter.listFiles(rootPath));
+    },
+    (items) => {
+      if (options.json) {
+        console.log(jsonFiles(items));
+      } else {
+        textFiles(items).forEach((line) => console.log(line));
+      }
     }
-  });
+  );
 };
 
 export const run = async (version: string) => {
