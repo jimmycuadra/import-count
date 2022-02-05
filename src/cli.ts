@@ -4,7 +4,7 @@ import { Command } from "commander";
 import glob from "glob";
 
 import {
-  ImportMap,
+  Counter,
   countDescending,
   countFilesAscending,
   json,
@@ -14,9 +14,9 @@ import {
   textFiles,
 } from "./";
 
-const createImportMap = async (
+const withCounter = async (
   rawRootPath: string,
-  callback: (rootPath: string, importMap: ImportMap) => void
+  callback: (rootPath: string, counter: Counter) => void
 ) => {
   const normalizedRootPath = normalize(rawRootPath);
 
@@ -45,19 +45,19 @@ const createImportMap = async (
 
       const resolvedRootPath = resolve(rootPath);
 
-      const importMap = await parsePaths(
+      const counter = await parsePaths(
         resolvedRootPath,
         paths.map((path) => resolve(path))
       );
 
-      callback(resolvedRootPath, importMap);
+      callback(resolvedRootPath, counter);
     }
   );
 };
 
 const mostCommon = (rawRootPath: string, options: { json: boolean }) => {
-  return createImportMap(rawRootPath, (_, importMap) => {
-    const sorted = countDescending(importMap.listImports());
+  return withCounter(rawRootPath, (_, counter) => {
+    const sorted = countDescending(counter.listImports());
 
     if (sorted.length === 0) {
       console.error("No import statements found.");
@@ -71,8 +71,8 @@ const mostCommon = (rawRootPath: string, options: { json: boolean }) => {
 };
 
 const fewestImports = (rawRootPath: string, options: { json: boolean }) => {
-  return createImportMap(rawRootPath, (rootPath, importMap) => {
-    const sorted = countFilesAscending(importMap.listFiles(rootPath));
+  return withCounter(rawRootPath, (rootPath, counter) => {
+    const sorted = countFilesAscending(counter.listFiles(rootPath));
 
     if (sorted.length === 0) {
       console.error("No import statements found.");

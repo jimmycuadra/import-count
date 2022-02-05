@@ -14,13 +14,13 @@ export type ImportCount = Import & Count;
 
 export type FileCount = File & Count;
 
-export class ImportMap {
+export class Counter {
   #files: Record<string, number>;
-  #map: Record<string, Record<string, IdentCount>>;
+  #imports: Record<string, Record<string, IdentCount>>;
 
   constructor() {
-    this.#map = {};
     this.#files = {};
+    this.#imports = {};
   }
 
   increment(path: string, { ident, kind, mod }: Import): void {
@@ -32,14 +32,14 @@ export class ImportMap {
       this.#files[path] += 1;
     }
 
-    const sourceCountMap = this.#map[mod] ?? (this.#map[mod] = {});
+    const sourceCounter = this.#imports[mod] ?? (this.#imports[mod] = {});
 
     const key = ident + "." + kind;
 
-    const identOccurrence = sourceCountMap[key];
+    const identOccurrence = sourceCounter[key];
 
     if (identOccurrence == null) {
-      sourceCountMap[key] = {
+      sourceCounter[key] = {
         count: 1,
         ident,
         kind,
@@ -65,8 +65,8 @@ export class ImportMap {
   }
 
   listImports() {
-    return Object.keys(this.#map).reduce((acc, mod) => {
-      const idents = this.#map[mod];
+    return Object.keys(this.#imports).reduce((acc, mod) => {
+      const idents = this.#imports[mod];
 
       if (idents != null) {
         for (const identString of Object.keys(idents)) {
@@ -86,4 +86,4 @@ export class ImportMap {
   }
 }
 
-export default ImportMap;
+export default Counter;

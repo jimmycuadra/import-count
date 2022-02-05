@@ -1,4 +1,4 @@
-import type { FileCount, ImportCount } from "./map";
+import type { FileCount, ImportCount } from "./count";
 
 export const text = (importCounts: ImportCount[]) => {
   return importCounts.map((importCount) => {
