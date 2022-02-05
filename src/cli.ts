@@ -3,16 +3,15 @@ import { Command } from "commander";
 
 import glob from "glob";
 
+import Counter from "./count";
 import {
-  Counter,
-  countDescending,
-  countFilesAscending,
-  json,
-  jsonFiles,
-  parsePaths,
-  text,
-  textFiles,
-} from "./";
+  filesAsJson,
+  filesAsText,
+  importsAsJson,
+  importsAsText,
+} from "./format";
+import { parsePaths } from "./parse";
+import { sortFiles, sortImports } from "./sort";
 
 const withCounter = async <Item>(
   rawRootPath: string,
@@ -67,13 +66,13 @@ const mostCommon = (rawRootPath: string, options: { json: boolean }) => {
   return withCounter(
     rawRootPath,
     (_, counter) => {
-      return countDescending(counter.listImports());
+      return sortImports(counter.listImports());
     },
     (items) => {
       if (options.json) {
-        console.log(json(items));
+        console.log(importsAsJson(items));
       } else {
-        text(items).forEach((line) => console.log(line));
+        importsAsText(items).forEach((line) => console.log(line));
       }
     }
   );
@@ -83,13 +82,13 @@ const fewestImports = (rawRootPath: string, options: { json: boolean }) => {
   return withCounter(
     rawRootPath,
     (rootPath, counter) => {
-      return countFilesAscending(counter.listFiles(rootPath));
+      return sortFiles(counter.listFiles(rootPath));
     },
     (items) => {
       if (options.json) {
-        console.log(jsonFiles(items));
+        console.log(filesAsJson(items));
       } else {
-        textFiles(items).forEach((line) => console.log(line));
+        filesAsText(items).forEach((line) => console.log(line));
       }
     }
   );

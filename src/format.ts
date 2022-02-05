@@ -1,6 +1,6 @@
 import type { FileCount, ImportCount } from "./count";
 
-export const text = (importCounts: ImportCount[]) => {
+export const importsAsText = (importCounts: ImportCount[]) => {
   return importCounts.map((importCount) => {
     if (importCount.kind === "default") {
       return `import ${importCount.ident} from "${importCount.mod}": ${importCount.count}`;
@@ -12,13 +12,13 @@ export const text = (importCounts: ImportCount[]) => {
   });
 };
 
-export const textFiles = (fileCounts: FileCount[]) => {
+export const filesAsText = (fileCounts: FileCount[]) => {
   return fileCounts.map((fileCount) => {
     return `${fileCount.path}: ${fileCount.count}`;
   });
 };
 
-export const json = (importCounts: ImportCount[]) => {
+export const importsAsJson = (importCounts: ImportCount[]) => {
   const json = importCounts.reduce((acc, importCount) => {
     const imp = {
       count: importCount.count,
@@ -40,6 +40,6 @@ export const json = (importCounts: ImportCount[]) => {
   return JSON.stringify(json);
 };
 
-export const jsonFiles = (fileCounts: FileCount[]) => {
+export const filesAsJson = (fileCounts: FileCount[]) => {
   return JSON.stringify(fileCounts);
 };

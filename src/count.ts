@@ -49,7 +49,7 @@ export class Counter {
     }
   }
 
-  listFiles(rootPath: string) {
+  listFiles(rootPath: string): FileCount[] {
     return Object.keys(this.#files).reduce((acc, path) => {
       const count = this.#files[path];
 
@@ -64,7 +64,7 @@ export class Counter {
     }, [] as FileCount[]);
   }
 
-  listImports() {
+  listImports(): ImportCount[] {
     return Object.keys(this.#imports).reduce((acc, mod) => {
       const idents = this.#imports[mod];
 

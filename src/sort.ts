@@ -1,6 +1,6 @@
 import type { FileCount, ImportCount } from "./count";
 
-export const countDescending = (importCounts: ImportCount[]) => {
+export const sortImports = (importCounts: ImportCount[]) => {
   return importCounts.sort((a, b) => {
     const aString = `${a.mod}.${a.ident}`;
     const bString = `${b.mod}.${b.ident}`;
@@ -12,7 +12,7 @@ export const countDescending = (importCounts: ImportCount[]) => {
   });
 };
 
-export const countFilesAscending = (fileCounts: FileCount[]) => {
+export const sortFiles = (fileCounts: FileCount[]) => {
   return fileCounts.sort((a, b) => {
     return a.count - b.count;
   });

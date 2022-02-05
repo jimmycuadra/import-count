@@ -1,4 +1,9 @@
 export { Counter } from "./count";
-export { countDescending, countFilesAscending } from "./sort";
-export { parsePath, parsePaths } from "./parse";
-export { json, jsonFiles, text, textFiles } from "./format";
+export {
+  filesAsJson,
+  filesAsText,
+  importsAsJson,
+  importsAsText,
+} from "./format";
+export { parsePaths } from "./parse";
+export { sortFiles, sortImports } from "./sort";
