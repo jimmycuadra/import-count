@@ -1,98 +1,102 @@
-import { readFile } from "fs/promises";
-import { dirname, resolve } from "path";
+import {readFile} from 'fs/promises';
+import {dirname, resolve} from 'path';
 
-import { Parser as BaseParser } from "acorn";
-import acornJsx from "acorn-jsx";
-import type { Program } from "estree";
+import {Parser as BaseParser} from 'acorn';
+import acornJsx from 'acorn-jsx';
+import type {Program} from 'estree';
 
-import Counter from "./count";
+import Counter from './count';
 
 export interface Ident {
-  ident: string;
-  kind: "named" | "default" | "namespace";
+    ident: string;
+    kind: 'named' | 'default' | 'namespace';
 }
 
 export interface Import extends Ident {
-  mod: string;
+    mod: string;
 }
 
 const Parser = BaseParser.extend(acornJsx());
 
 const resolveImportSource = (
-  rootPath: string,
-  path: string,
-  source: string
+    rootPath: string,
+    path: string,
+    source: string
 ) => {
-  if (source[0] === ".") {
-    return resolve(dirname(path), source).replace(
-      new RegExp(`${rootPath}/?`),
-      "./"
-    );
-  } else {
-    return source;
-  }
+    if (source[0] === '.') {
+        return resolve(dirname(path), source).replace(
+            new RegExp(`${rootPath}/?`),
+            './'
+        );
+    } else {
+        return source;
+    }
 };
 
 const trackImports = (
-  body: Program["body"],
-  rootPath: string,
-  path: string,
-  cb: (imp: Import) => void
+    body: Program['body'],
+    rootPath: string,
+    path: string,
+    cb: (imp: Import) => void
 ) => {
-  return body.forEach((node) => {
-    if (node.type === "ImportDeclaration") {
-      if (typeof node.source.value == "string") {
-        for (const specifier of node.specifiers) {
-          let ident;
-          let kind;
+    return body.forEach((node) => {
+        if (node.type === 'ImportDeclaration') {
+            if (typeof node.source.value == 'string') {
+                for (const specifier of node.specifiers) {
+                    let ident;
+                    let kind;
 
-          if (specifier.type === "ImportSpecifier") {
-            ident = specifier.imported.name;
-            kind = "named" as const;
-          } else if (specifier.type === "ImportDefaultSpecifier") {
-            ident = specifier.local.name;
-            kind = "default" as const;
-          } else {
-            ident = specifier.local.name;
-            kind = "namespace" as const;
-          }
+                    if (specifier.type === 'ImportSpecifier') {
+                        ident = specifier.imported.name;
+                        kind = 'named' as const;
+                    } else if (specifier.type === 'ImportDefaultSpecifier') {
+                        ident = specifier.local.name;
+                        kind = 'default' as const;
+                    } else {
+                        ident = specifier.local.name;
+                        kind = 'namespace' as const;
+                    }
 
-          cb({
-            mod: resolveImportSource(rootPath, path, node.source.value),
-            ident,
-            kind,
-          });
+                    cb({
+                        mod: resolveImportSource(
+                            rootPath,
+                            path,
+                            node.source.value
+                        ),
+                        ident,
+                        kind,
+                    });
+                }
+            }
         }
-      }
-    }
-  }, [] as Import[]);
+    }, [] as Import[]);
 };
 
 export const parsePaths = async (rootPath: string, paths: string[]) => {
-  const counter = new Counter();
+    const counter = new Counter();
 
-  for (const path of paths) {
-    Object.assign(counter, await parsePath(rootPath, path, counter));
-  }
+    for (const path of paths) {
+        Object.assign(counter, await parsePath(rootPath, path, counter));
+    }
 
-  return counter;
+    return counter;
 };
 
 export const parsePath = async (
-  rootPath: string,
-  path: string,
-  counter = new Counter()
+    rootPath: string,
+    path: string,
+    counter = new Counter()
 ) => {
-  const sourceCode = await readFile(path, "utf8");
+    const sourceCode = await readFile(path, 'utf8');
 
-  const root = Parser.parse(sourceCode, {
-    ecmaVersion: "latest",
-    sourceType: "module",
-  }) as unknown as Program;
+    const root = Parser.parse(sourceCode, {
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+    }) as unknown as Program;
 
-  trackImports(root.body, rootPath, path, (imp) =>
-    counter.increment(path, imp)
-  );
+    trackImports(root.body, rootPath, path, (imp) =>
+        counter.increment(path, imp)
+    );
 
-  return counter;
+    return counter;
 };
